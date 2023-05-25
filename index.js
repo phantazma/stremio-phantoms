@@ -1,6 +1,6 @@
 const { addonBuilder, serveHTTP, publishToCentral }  = require('stremio-addon-sdk')
 const https = require('https');
-const puppeteer = require('puppeteer');
+const chromium = require('chrome-aws-lambda');
 
 //Proxy to remove
 //const proxy  = 'http://192.168.10.135:8080';
@@ -12,7 +12,7 @@ const builder = new addonBuilder({
     id: 'org.phantazma',
     version: '1.18.0',
     name: 'Phantom',
-    icon: "https://pics.freeicons.io/uploads/icons/png/4430291111679029297-256.png", 
+	//icon: "https://pics.freeicons.io/uploads/icons/png/4430291111679029297-256.png", 
     //background: "URL to 1024x786 png/jpg background",
     catalogs: [],
     resources: ['stream'],
@@ -72,6 +72,7 @@ function CheckIMDB(id,type,season,episode, callback){
 	  path: '/meta/'+ type + '/' + id + '.json',
 	  method: 'GET',
 	  rejectUnauthorized: false,
+	  //proxy:proxy,
 	};
 		
 	const req = https.request(options0, (res) => {
@@ -83,6 +84,7 @@ function CheckIMDB(id,type,season,episode, callback){
 		res.on('end', () => {
 			try {
 				const data = JSON.parse(resAccum);
+				
 				CheckFromSource(data.meta.name,season,episode, function(urls) {
 					callback(urls);
 
@@ -107,12 +109,14 @@ function CheckIMDB(id,type,season,episode, callback){
 function CheckFromSource(name,season,episode, callback){
 	
 	const data = '{"search":"'+Buffer.from(name, 'utf-8').toString()+'"}'
+	console.log(data);
 	const options = {
 	  hostname: 'empire-streaming.app',
 	  port: 443,
 	  path: '/api/views/search',
 	  method: 'POST',
 	  rejectUnauthorized: false,
+	  //proxy:proxy,
 	  headers: {
 		'Content-Type': 'application/json;charset=UTF-8',
 		'Content-Length': data.length,
@@ -186,6 +190,7 @@ function CheckFromUrl(url,season,episode,callback){
 		  path: "/"+url,
 		  method: 'POST',
 		  rejectUnauthorized: false,
+		  //proxy:proxy,
 		  headers: {
 			'Content-Type': 'application/json;charset=UTF-8',
 			'Content-Length': 24,
@@ -275,6 +280,8 @@ function CheckFromUrl(url,season,episode,callback){
 						});
 						
 						}
+						
+						console.log(mystream);
 					  
 						getSblongvuUrl(mystream, function(response) {
 							callback(response);
@@ -315,8 +322,11 @@ async function getSblongvuUrl(urls,callback){
 	m3u8list = [];
 
  try {
-    const browser = await puppeteer.launch({
+	 
+    browser = await chromium.puppeteer.launch({
+       executablePath: await chromium.executablePath,   
       args: [
+        //'--proxy-server=http://192.168.10.135:8080',
         '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
@@ -332,6 +342,7 @@ async function getSblongvuUrl(urls,callback){
       ignoreHTTPSErrors: true,
       acceptInsecureCerts: true
     });
+	
 
     const scrapeWebsite = async (url) => {
       const page = await browser.newPage();
@@ -388,6 +399,7 @@ function FetchLoop(stream){
 			path: "/"+stream,
 			method: 'GET',
 			rejectUnauthorized: false,
+			//proxy:proxy,
 			headers: {
 				'watchsb': 'sbstream',
 				'Accept': 'application/json, text/plain, */*',
