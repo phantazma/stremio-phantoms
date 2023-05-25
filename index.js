@@ -319,7 +319,6 @@ async function getSblongvuUrl(urls,callback){
 
  try {
     const browser = await puppeteer.launch({
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
       args: [
         '--proxy-server=http://192.168.10.135:8080',
         '--disable-gpu',
