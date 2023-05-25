@@ -3,7 +3,7 @@ const https = require('https');
 const puppeteer = require('puppeteer');
 
 //Proxy to remove
-const proxy  = 'http://192.168.10.135:8080';
+//const proxy  = 'http://192.168.10.135:8080';
 //const proxy = 'https://157.167.107.150';
 
 var m3u8list = [];
@@ -12,7 +12,7 @@ const builder = new addonBuilder({
     id: 'org.phantazma',
     version: '1.18.0',
     name: 'Phantom',
-	//icon: "https://pics.freeicons.io/uploads/icons/png/4430291111679029297-256.png", 
+    icon: "https://pics.freeicons.io/uploads/icons/png/4430291111679029297-256.png", 
     //background: "URL to 1024x786 png/jpg background",
     catalogs: [],
     resources: ['stream'],
@@ -72,7 +72,6 @@ function CheckIMDB(id,type,season,episode, callback){
 	  path: '/meta/'+ type + '/' + id + '.json',
 	  method: 'GET',
 	  rejectUnauthorized: false,
-	  proxy:proxy,
 	};
 		
 	const req = https.request(options0, (res) => {
@@ -114,7 +113,6 @@ function CheckFromSource(name,season,episode, callback){
 	  path: '/api/views/search',
 	  method: 'POST',
 	  rejectUnauthorized: false,
-	  proxy:proxy,
 	  headers: {
 		'Content-Type': 'application/json;charset=UTF-8',
 		'Content-Length': data.length,
@@ -188,7 +186,6 @@ function CheckFromUrl(url,season,episode,callback){
 		  path: "/"+url,
 		  method: 'POST',
 		  rejectUnauthorized: false,
-		  proxy:proxy,
 		  headers: {
 			'Content-Type': 'application/json;charset=UTF-8',
 			'Content-Length': 24,
@@ -320,7 +317,6 @@ async function getSblongvuUrl(urls,callback){
  try {
     const browser = await puppeteer.launch({
       args: [
-        '--proxy-server=http://192.168.10.135:8080',
         '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
@@ -392,7 +388,6 @@ function FetchLoop(stream){
 			path: "/"+stream,
 			method: 'GET',
 			rejectUnauthorized: false,
-			proxy:proxy,
 			headers: {
 				'watchsb': 'sbstream',
 				'Accept': 'application/json, text/plain, */*',
