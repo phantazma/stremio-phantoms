@@ -7,28 +7,16 @@
     "start": "vercel dev",
     "test": "jest -i"
   },
-  "dependencies": {
-    "express": "^4.17.1",
-    "helmet": "^4.6.0"
-  },
   "keywords": [
     "vercel"
   ],
   "author": "Kizito Akhilome <kizito@akhilo.me>",
   "license": "MIT",
-  "devDependencies": {
-     "chromium": "^3.0.3",
-    "chromium-installer": "^0.8.1",
-    "download-chromium": "^3.0.0",
-    "follow-redirects": "^1.15.2",
-    "git": "^0.1.5",
-    "https-proxy-agent": "^6.1.0",
-    "i": "^0.3.7",
-    "needle": "^3.2.0",
-    "npm": "^9.6.6",
-    "puppeteer": "^20.1.2",
-    "request": "^2.88.2",
-    "request-promise-native": "^1.0.9",
+ "dependencies": {
+    "chrome-aws-lambda": "^10.1.0",
     "stremio-addon-sdk": "^1.6.10"
+  },
+  "devDependencies": {
+    "puppeteer": "^20.4.0"
   }
 }
