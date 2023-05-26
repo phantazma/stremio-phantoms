@@ -330,7 +330,7 @@ var theurls = [];
 	
 	theUrl = theUrl+Buffer.from(RandomeString()+'||'+url.url+'||'+RandomeString()+'||streamsb', 'utf8').toString('hex');
 	
-	console.log("url.url"+url.url)
+	console.log("url.url : "+url.url)
 	  
 	  	const options3 = {
 			hostname: 'sblongvu.com',
