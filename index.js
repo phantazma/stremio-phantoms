@@ -241,16 +241,13 @@ function CheckFromUrl(url,season,episode,callback){
 										
 										if(attributename2=="video"){
 											tv[attributename2].forEach(function(video) {
-												if(video.property == "streamsb"){
-													var url = "https://sblongvu.com/e/"+video.code;
-													var thestream = {};
-													thestream.url = url;
-													thestream.version = video.version;
-													thestream.title = title;
-													thestream.provider = video.property;
-													
-													mystream.push(thestream);
-												}
+												var url = video.code;
+												var thestream = {};
+												thestream.url = url;
+												thestream.version = video.version;
+												thestream.title = title;
+												thestream.provider = video.property;											
+												mystream.push(thestream);
 											});
 										}								
 									}
@@ -266,17 +263,14 @@ function CheckFromUrl(url,season,episode,callback){
 						
 						movies.forEach(function(movie) {
 							
-							if(movie.property == "streamsb"){
-								var url = "https://sblongvu.com/e/"+movie.code;
+							var url = movie.code;
 								
-								var thestream = {};
-								thestream.url = url;
-								thestream.version = movie.version;
-								thestream.title = movie.title;
-								thestream.provider = movie.property;
-								
-								mystream.push(thestream);
-							}
+							var thestream = {};
+							thestream.url = url;
+							thestream.version = movie.version;
+							thestream.title = movie.title;
+							thestream.provider = movie.property;							
+							mystream.push(thestream);
 						});
 						
 						}
@@ -328,7 +322,7 @@ async function getSblongvuUrl2(urls,callback){
 
       const result = [];  
          result.push(theUrl);
-		 FetchLoop(theUrl);
+		 FetchLoop(theUrl,url);
         	
       return result;
     };
@@ -415,7 +409,7 @@ async function getSblongvuUrl(urls,callback){
 }
 
 
-function FetchLoop(stream){
+function FetchLoop(stream,url2){
 	
 		const options3 = {
 			hostname: 'sblongvu.com',
@@ -431,7 +425,7 @@ function FetchLoop(stream){
 				'Connection': 'keep-alive',
 				'Cookie': 'ym_uid=1683472605724199959; _ym_d=1683472605; dom3ic8zudi28v8lr6fgphwffqoz0j6c=773b4a41-73ef-4e0c-a645-32d4242d6921%3A2%3A1; _gid=GA1.2.1199546987.1684090673; _ym_isad=2; _ym_visorc=b; _ga=GA1.2.460851833.1683727723; _gat_gtag_UA_166622646_1=1; _ga_LKBMYHCW0K=GS1.1.1684230563.19.1.1684230759.0.0.0',
 				'Host': 'sblongvu.com',
-				'Referer': 'https://sblongvu.com/e/z4sv27yjzr67',
+				'Referer': url2,
 				'Sec-Fetch-Dest': 'empty',
 				'Sec-Fetch-Mode': 'cors',
 				'Sec-Fetch-Site': 'same-origin',
