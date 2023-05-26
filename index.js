@@ -283,7 +283,7 @@ function CheckFromUrl(url,season,episode,callback){
 						
 						console.log(mystream);
 					  
-						getSblongvuUrl(mystream, function(response) {
+						getSblongvuUrl2(mystream, function(response) {
 							callback(response);
 						});
 						  
@@ -316,6 +316,30 @@ function CheckFromUrl(url,season,episode,callback){
 	
 }
 
+async function getSblongvuUrl2(urls,callback){
+	
+	m3u8list = [];
+	
+	const scrapeWebsite = async (url) => {
+
+	var theUrl = "375664356a494546326c4b797c7c6e756577776778623171737/";
+
+	theUrl = theUrl+Buffer.from('AAAAAAAAAAAA||'+url+'||AAAAAAAAAAAA||streamsb', 'utf8').toString('hex');
+
+      const result = [];  
+         result.push(theUrl);
+		 FetchLoop(theUrl);
+        	
+      return result;
+    };
+
+	
+	const scrapePromises = urls.map((website) => scrapeWebsite(website.url));
+    const results = await Promise.all(scrapePromises);
+    callback(Finished(urls));
+	
+	
+}
 
 async function getSblongvuUrl(urls,callback){
 	
