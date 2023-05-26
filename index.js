@@ -327,8 +327,8 @@ var theurls = [];
   const requests = theurls.map(url => {
 	  
 	var theUrl = "375664356a494546326c4b797c7c6e756577776778623171737/";
-
-	theUrl = theUrl+Buffer.from('AAAAAAAAAAAA||'+url.url+'||AAAAAAAAAAAA||streamsb', 'utf8').toString('hex');
+	
+	theUrl = theUrl+Buffer.from(RandomeString()+'||'+url.url+'||'+RandomeString()+'||streamsb', 'utf8').toString('hex');
 	
 	console.log("url.url"+url.url)
 	  
@@ -405,6 +405,42 @@ var theurls = [];
     });
 	
 	
+}
+
+function RandomeString(){
+
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+
+  // Generate a random uppercase letter
+  randomString += getRandomCharacter('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+  // Generate a random lowercase letter
+  randomString += getRandomCharacter('abcdefghijklmnopqrstuvwxyz');
+  // Generate a random number
+  randomString += getRandomCharacter('0123456789');
+
+  // Generate the remaining characters randomly
+  for (let i = 0; i < 9; i++) {
+    randomString += getRandomCharacter(characters);
+  }
+
+  // Shuffle the string randomly
+  randomString = shuffleString(randomString);
+
+  return randomString;
+}
+
+function getRandomCharacter(characters) {
+  return characters.charAt(Math.floor(Math.random() * characters.length));
+}
+
+function shuffleString(string) {
+  const array = string.split('');
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array.join('');
 }
 
 async function getSblongvuUrl(urls,callback){
