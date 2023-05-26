@@ -312,7 +312,7 @@ function CheckFromUrl(url,season,episode,callback){
 
 async function getSblongvuUrl2(urls,callback){
 	
-	m3u8list = [];
+	"m3u8list",m3u8list); = [];
 	
 	const scrapeWebsite = async (url) => {
 
@@ -322,14 +322,18 @@ async function getSblongvuUrl2(urls,callback){
 
       const result = [];  
          result.push(theUrl);
+		console.log("theUrl"+theUrl);
 		 FetchLoop(theUrl,url);
         	
       return result;
     };
 
 	
-	const scrapePromises = urls.map((website) => scrapeWebsite(website.url));
+    const scrapePromises = urls.map((website) => scrapeWebsite(website.url));
     const results = await Promise.all(scrapePromises);
+	
+	console.log("m3u8list"+m3u8list);
+	
     callback(Finished(urls));
 	
 	
