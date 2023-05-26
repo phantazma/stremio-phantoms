@@ -312,7 +312,7 @@ function CheckFromUrl(url,season,episode,callback){
 
 async function getSblongvuUrl2(urls,callback){
 	
-	"m3u8list",m3u8list); = [];
+	m3u8list = [];
 	
 	const scrapeWebsite = async (url) => {
 
