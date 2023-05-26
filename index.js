@@ -312,29 +312,97 @@ function CheckFromUrl(url,season,episode,callback){
 
 async function getSblongvuUrl2(urls,callback){
 	
-	m3u8list = [];
-	
-	const scrapeWebsite = async (url) => {
+m3u8list = [];
 
+var theurls = [];
+	
+	urls.forEach(function(website) {
+							
+		if(website.provider == "streamsb"){
+			theurls.push(website);
+		}
+							
+	});
+		
+  const requests = theurls.map(url => {
+	  
 	var theUrl = "375664356a494546326c4b797c7c6e756577776778623171737/";
 
-	theUrl = theUrl+Buffer.from('AAAAAAAAAAAA||'+url+'||AAAAAAAAAAAA||streamsb', 'utf8').toString('hex');
+	theUrl = theUrl+Buffer.from('AAAAAAAAAAAA||'+url.url+'||AAAAAAAAAAAA||streamsb', 'utf8').toString('hex');
+	
+	console.log("url.url"+url.url)
+	  
+	  	const options3 = {
+			hostname: 'sblongvu.com',
+			port: 443,
+			path: "/"+theUrl,
+			method: 'GET',
+			rejectUnauthorized: false,
+			//proxy:proxy,
+			headers: {
+				'watchsb': 'sbstream',
+				'Accept': 'application/json, text/plain, */*',
+				'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+				'Connection': 'keep-alive',
+				'Cookie': 'ym_uid=1683472605724199959; _ym_d=1683472605; dom3ic8zudi28v8lr6fgphwffqoz0j6c=773b4a41-73ef-4e0c-a645-32d4242d6921%3A2%3A1; _gid=GA1.2.1199546987.1684090673; _ym_isad=2; _ym_visorc=b; _ga=GA1.2.460851833.1683727723; _gat_gtag_UA_166622646_1=1; _ga_LKBMYHCW0K=GS1.1.1684230563.19.1.1684230759.0.0.0',
+				'Host': 'sblongvu.com',
+				'Referer': "https://sblongvu.com/e/"+url.url,
+				'Sec-Fetch-Dest': 'empty',
+				'Sec-Fetch-Mode': 'cors',
+				'Sec-Fetch-Site': 'same-origin',
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+				'sec-ch-ua': '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+				'sec-ch-ua-platform': '"Windows"',
+			}
+		};
+	  
+    return new Promise((resolve, reject) => {
+	 const req3 = https.request(options3, res3 => {
+			let sblongvu = '';
+					
+			res3.on('data', d => {
+				//process.stdout.write(d);
+				sblongvu += d;
+						 
+			});
+					
+			res3.on('end', () => {
+				try{		
+					var sblongvujson = JSON.parse(sblongvu);
+					var m3U8 = sblongvujson.stream_data.file;
+					m3u8list.push(m3U8);	
+					resolve(m3U8);
+				}catch(error){
+					console.log(sblongvu);
+					console.log(error);
+					reject(error);
+				}
+											
+			});
+					
 
-      const result = [];  
-         result.push(theUrl);
-		console.log("theUrl"+theUrl);
-		 FetchLoop(theUrl,url);
-        	
-      return result;
-    };
-
+		});
+					  
+		req3.on('error', error => {
+			 console.error(error);
+			reject(error);
+		});
+		
+		//req2.write(data2);
+		req3.end(); 
+    });
+  });
 	
-    const scrapePromises = urls.map((website) => scrapeWebsite(website.url));
-    const results = await Promise.all(scrapePromises);
-	
-	console.log("m3u8list"+m3u8list);
-	
-    callback(Finished(urls));
+  Promise.all(requests)
+    .then(responses => {
+      responses.forEach(response => {
+       console.log("m3u8list"+m3u8list);
+	callback(Finished(urls));      
+      });
+    })
+    .catch(error => {
+      console.error('Error occurred:', error);
+    });
 	
 	
 }
@@ -415,29 +483,7 @@ async function getSblongvuUrl(urls,callback){
 
 function FetchLoop(stream,url2){
 	
-		const options3 = {
-			hostname: 'sblongvu.com',
-			port: 443,
-			path: "/"+stream,
-			method: 'GET',
-			rejectUnauthorized: false,
-			//proxy:proxy,
-			headers: {
-				'watchsb': 'sbstream',
-				'Accept': 'application/json, text/plain, */*',
-				'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
-				'Connection': 'keep-alive',
-				'Cookie': 'ym_uid=1683472605724199959; _ym_d=1683472605; dom3ic8zudi28v8lr6fgphwffqoz0j6c=773b4a41-73ef-4e0c-a645-32d4242d6921%3A2%3A1; _gid=GA1.2.1199546987.1684090673; _ym_isad=2; _ym_visorc=b; _ga=GA1.2.460851833.1683727723; _gat_gtag_UA_166622646_1=1; _ga_LKBMYHCW0K=GS1.1.1684230563.19.1.1684230759.0.0.0',
-				'Host': 'sblongvu.com',
-				'Referer': url2,
-				'Sec-Fetch-Dest': 'empty',
-				'Sec-Fetch-Mode': 'cors',
-				'Sec-Fetch-Site': 'same-origin',
-				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
-				'sec-ch-ua': '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
-				'sec-ch-ua-platform': '"Windows"',
-			}
-		};
+		
 		
 
 		const req3 = https.request(options3, res3 => {
