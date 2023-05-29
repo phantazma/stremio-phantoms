@@ -1,10 +1,7 @@
 const { addonBuilder, serveHTTP, publishToCentral }  = require('stremio-addon-sdk')
 const https = require('https');
-const chromium = require('chrome-aws-lambda');
+const puppeteer = require('puppeteer');
 
-//Proxy to remove
-//const proxy  = 'http://192.168.10.135:8080';
-//const proxy = 'https://157.167.107.150';
 
 var m3u8list = [];
 
@@ -24,7 +21,6 @@ const builder = new addonBuilder({
 
 builder.defineStreamHandler(function(args) {
 
-//function defineStreamHandler(){
 
 	var urlTable = [];
 
@@ -62,7 +58,7 @@ builder.defineStreamHandler(function(args) {
 	//return Promise.resolve({streams: urlTable});	
 
 });
-//}
+
 
 function CheckIMDB(id,type,season,episode, callback){
 	//https://cinemeta-live.strem.io/meta/series/tt11269130.json
@@ -72,7 +68,6 @@ function CheckIMDB(id,type,season,episode, callback){
 	  path: '/meta/'+ type + '/' + id + '.json',
 	  method: 'GET',
 	  rejectUnauthorized: false,
-	  //proxy:proxy,
 	};
 		
 	const req = https.request(options0, (res) => {
@@ -84,7 +79,6 @@ function CheckIMDB(id,type,season,episode, callback){
 		res.on('end', () => {
 			try {
 				const data = JSON.parse(resAccum);
-				
 				CheckFromSource(data.meta.name,season,episode, function(urls) {
 					callback(urls);
 
@@ -109,14 +103,12 @@ function CheckIMDB(id,type,season,episode, callback){
 function CheckFromSource(name,season,episode, callback){
 	
 	const data = '{"search":"'+Buffer.from(name, 'utf-8').toString()+'"}'
-	console.log(data);
 	const options = {
 	  hostname: 'empire-streaming.app',
 	  port: 443,
 	  path: '/api/views/search',
 	  method: 'POST',
 	  rejectUnauthorized: false,
-	  //proxy:proxy,
 	  headers: {
 		'Content-Type': 'application/json;charset=UTF-8',
 		'Content-Length': data.length,
@@ -190,7 +182,6 @@ function CheckFromUrl(url,season,episode,callback){
 		  path: "/"+url,
 		  method: 'POST',
 		  rejectUnauthorized: false,
-		  //proxy:proxy,
 		  headers: {
 			'Content-Type': 'application/json;charset=UTF-8',
 			'Content-Length': 24,
@@ -241,13 +232,16 @@ function CheckFromUrl(url,season,episode,callback){
 										
 										if(attributename2=="video"){
 											tv[attributename2].forEach(function(video) {
-												var url = video.code;
-												var thestream = {};
-												thestream.url = url;
-												thestream.version = video.version;
-												thestream.title = title;
-												thestream.provider = video.property;											
-												mystream.push(thestream);
+												if(video.property == "streamsb"){
+													var url = "https://sblongvu.com/e/"+video.code;
+													var thestream = {};
+													thestream.url = url;
+													thestream.version = video.version;
+													thestream.title = title;
+													thestream.provider = video.property;
+													
+													mystream.push(thestream);
+												}
 											});
 										}								
 									}
@@ -263,21 +257,22 @@ function CheckFromUrl(url,season,episode,callback){
 						
 						movies.forEach(function(movie) {
 							
-							var url = movie.code;
+							if(movie.property == "streamsb"){
+								var url = "https://sblongvu.com/e/"+movie.code;
 								
-							var thestream = {};
-							thestream.url = url;
-							thestream.version = movie.version;
-							thestream.title = movie.title;
-							thestream.provider = movie.property;							
-							mystream.push(thestream);
+								var thestream = {};
+								thestream.url = url;
+								thestream.version = movie.version;
+								thestream.title = movie.title;
+								thestream.provider = movie.property;
+								
+								mystream.push(thestream);
+							}
 						});
 						
 						}
-						
-						console.log(mystream);
 					  
-						getSblongvuUrl2(mystream, function(response) {
+						getSblongvuUrl(mystream, function(response) {
 							callback(response);
 						});
 						  
@@ -310,138 +305,6 @@ function CheckFromUrl(url,season,episode,callback){
 	
 }
 
-async function getSblongvuUrl2(urls,callback){
-	
-m3u8list = [];
-
-var theurls = [];
-	
-	urls.forEach(function(website) {
-							
-		if(website.provider == "streamsb"){
-			theurls.push(website);
-		}
-							
-	});
-		
-  const requests = theurls.map(url => {
-	  
-	var theUrl = "375664356a494546326c4b797c7c6e756577776778623171737/";
-	
-	theUrl = theUrl+Buffer.from(RandomeString()+'||'+url.url+'||'+RandomeString()+'||streamsb', 'utf8').toString('hex');
-	
-	console.log("url.url : "+theUrl)
-	  
-	  	const options3 = {
-			hostname: 'sblongvu.com',
-			port: 443,
-			path: "/"+theUrl,
-			method: 'GET',
-			rejectUnauthorized: false,
-			//proxy:proxy,
-			headers: {
-				'watchsb': 'sbstream',
-				'Accept': 'application/json, text/plain, */*',
-				'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
-				'Connection': 'keep-alive',
-				'Cookie': 'ym_uid=1683472605724199959; _ym_d=1683472605; dom3ic8zudi28v8lr6fgphwffqoz0j6c=773b4a41-73ef-4e0c-a645-32d4242d6921%3A2%3A1; _gid=GA1.2.1199546987.1684090673; _ym_isad=2; _ym_visorc=b; _ga=GA1.2.460851833.1683727723; _gat_gtag_UA_166622646_1=1; _ga_LKBMYHCW0K=GS1.1.1684230563.19.1.1684230759.0.0.0',
-				'Host': 'sblongvu.com',
-				'Referer': "https://sblongvu.com/e/"+url.url,
-				'Sec-Fetch-Dest': 'empty',
-				'Sec-Fetch-Mode': 'cors',
-				'Sec-Fetch-Site': 'same-origin',
-				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
-				'sec-ch-ua': '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
-				'sec-ch-ua-platform': '"Windows"',
-			}
-		};
-	  
-    return new Promise((resolve, reject) => {
-	 const req3 = https.request(options3, res3 => {
-			let sblongvu = '';
-					
-			res3.on('data', d => {
-				//process.stdout.write(d);
-				sblongvu += d;
-						 
-			});
-					
-			res3.on('end', () => {
-				try{		
-					var sblongvujson = JSON.parse(sblongvu);
-					var m3U8 = sblongvujson.stream_data.file;
-					m3u8list.push(m3U8);	
-					resolve(m3U8);
-				}catch(error){
-					console.log(sblongvu);
-					console.log(error);
-					reject(error);
-				}
-											
-			});
-					
-
-		});
-					  
-		req3.on('error', error => {
-			 console.error(error);
-			reject(error);
-		});
-		
-		//req2.write(data2);
-		req3.end(); 
-    });
-  });
-	
-  Promise.all(requests)
-    .then(responses => {
-      responses.forEach(response => {
-       console.log("m3u8list"+m3u8list);
-	callback(Finished(urls));      
-      });
-    })
-    .catch(error => {
-      console.error('Error occurred:', error);
-    });
-	
-	
-}
-
-function RandomeString(){
-
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomString = '';
-
-  // Generate a random uppercase letter
-  randomString += getRandomCharacter('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-  // Generate a random lowercase letter
-  randomString += getRandomCharacter('abcdefghijklmnopqrstuvwxyz');
-  // Generate a random number
-  randomString += getRandomCharacter('0123456789');
-
-  // Generate the remaining characters randomly
-  for (let i = 0; i < 9; i++) {
-    randomString += getRandomCharacter(characters);
-  }
-
-  // Shuffle the string randomly
-  randomString = shuffleString(randomString);
-
-  return randomString;
-}
-
-function getRandomCharacter(characters) {
-  return characters.charAt(Math.floor(Math.random() * characters.length));
-}
-
-function shuffleString(string) {
-  const array = string.split('');
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array.join('');
-}
 
 async function getSblongvuUrl(urls,callback){
 	
@@ -449,10 +312,8 @@ async function getSblongvuUrl(urls,callback){
 
  try {
 	 
-    browser = await chromium.puppeteer.launch({
-       executablePath: await chromium.executablePath,   
+    browser = await puppeteer.launch({
       args: [
-        //'--proxy-server=http://192.168.10.135:8080',
         '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
@@ -517,9 +378,30 @@ async function getSblongvuUrl(urls,callback){
 }
 
 
-function FetchLoop(stream,url2){
+function FetchLoop(stream){
 	
-		
+		const options3 = {
+			hostname: 'sblongvu.com',
+			port: 443,
+			path: "/"+stream,
+			method: 'GET',
+			rejectUnauthorized: false,
+			headers: {
+				'watchsb': 'sbstream',
+				'Accept': 'application/json, text/plain, */*',
+				'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+				'Connection': 'keep-alive',
+				'Cookie': 'ym_uid=1683472605724199959; _ym_d=1683472605; dom3ic8zudi28v8lr6fgphwffqoz0j6c=773b4a41-73ef-4e0c-a645-32d4242d6921%3A2%3A1; _gid=GA1.2.1199546987.1684090673; _ym_isad=2; _ym_visorc=b; _ga=GA1.2.460851833.1683727723; _gat_gtag_UA_166622646_1=1; _ga_LKBMYHCW0K=GS1.1.1684230563.19.1.1684230759.0.0.0',
+				'Host': 'sblongvu.com',
+				'Referer': 'https://sblongvu.com/e/z4sv27yjzr67',
+				'Sec-Fetch-Dest': 'empty',
+				'Sec-Fetch-Mode': 'cors',
+				'Sec-Fetch-Site': 'same-origin',
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+				'sec-ch-ua': '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+				'sec-ch-ua-platform': '"Windows"',
+			}
+		};
 		
 
 		const req3 = https.request(options3, res3 => {
@@ -535,7 +417,8 @@ function FetchLoop(stream,url2){
 				try{		
 					var sblongvujson = JSON.parse(sblongvu);
 					var m3U8 = sblongvujson.stream_data.file;
-					m3u8list.push(m3U8);			
+					m3u8list.push(m3U8);	
+					console.log(m3U8);					
 				}catch(error){
 					console.log(sblongvu);
 					console.log(error);
@@ -573,12 +456,4 @@ function Finished(urls){
 }	
 
 
-//serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
 module.exports = builder.getInterface()
-
-/*var args = {};
-
-args.id = "tt2911666";
-args.type="movie";
-
-defineStreamHandler(args);*/
