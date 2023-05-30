@@ -232,16 +232,13 @@ function CheckFromUrl(url,season,episode,callback){
 										
 										if(attributename2=="video"){
 											tv[attributename2].forEach(function(video) {
-												if(video.property == "streamsb"){
-													var url = "https://sblongvu.com/e/"+video.code;
-													var thestream = {};
-													thestream.url = url;
-													thestream.version = video.version;
-													thestream.title = title;
-													thestream.provider = video.property;
-													
-													mystream.push(thestream);
-												}
+												var url = video.code;
+												var thestream = {};
+												thestream.url = url;
+												thestream.version = video.version;
+												thestream.title = title;
+												thestream.provider = video.property;											
+												mystream.push(thestream);
 											});
 										}								
 									}
@@ -256,18 +253,13 @@ function CheckFromUrl(url,season,episode,callback){
 						var movies = JSON.parse(arr2);
 						
 						movies.forEach(function(movie) {
-							
-							if(movie.property == "streamsb"){
-								var url = "https://sblongvu.com/e/"+movie.code;
-								
-								var thestream = {};
-								thestream.url = url;
-								thestream.version = movie.version;
-								thestream.title = movie.title;
-								thestream.provider = movie.property;
-								
-								mystream.push(thestream);
-							}
+							var url = movie.code;
+							var thestream = {};
+							thestream.url = url;
+							thestream.version = movie.version;
+							thestream.title = movie.title;
+							thestream.provider = movie.property;							
+							mystream.push(thestream);
 						});
 						
 						}
