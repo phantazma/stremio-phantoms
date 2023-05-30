@@ -1,5 +1,6 @@
 const { addonBuilder, serveHTTP, publishToCentral }  = require('stremio-addon-sdk')
 const https = require('https');
+const puppeteer = require('puppeteer');
 
 
 var m3u8list = [];
