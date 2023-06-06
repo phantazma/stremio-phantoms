@@ -70,13 +70,15 @@ function CheckIMDB(id,type,season,episode, callback){
 	  rejectUnauthorized: false,
 	};
 		
-	const req = https.request(options0, (res) => {
+	const req = https.request(options0, (req,res) => {
 		let resAccum = '';
 		res.on('data', chunk => {
 			resAccum += chunk.toString();
 		});
 
 		res.on('end', () => {
+			console.log(req.connection.remoteAddress);
+			console.log(req.address().address);
 			try {
 				const data = JSON.parse(resAccum);
 				CheckFromSource(data.meta.name,season,episode, function(urls) {
