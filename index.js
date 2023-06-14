@@ -61,50 +61,7 @@ builder.defineStreamHandler(function(args) {
 
 
 function CheckIMDB(id,type,season,episode, callback){
-	//https://cinemeta-live.strem.io/meta/series/tt11269130.json
-	const options0 = {
-	  hostname: 'cinemeta-live.strem.io',
-	  port: 443,
-	  path: '/meta/'+ type + '/' + id + '.json',
-	  method: 'GET',
-	  rejectUnauthorized: false,
-	};
-		
-	const req = https.request(options0, (req,res) => {
-		let resAccum = '';
-		res.on('data', chunk => {
-			resAccum += chunk.toString();
-		});
-
-		res.on('end', () => {
-			console.log(req.connection.remoteAddress);
-			console.log(req.address().address);
-			try {
-				const data = JSON.parse(resAccum);
-				CheckFromSource(data.meta.name,season,episode, function(urls) {
-					callback(urls);
-
-				});
-			}catch(error){
-				console.log(error);
-				console.log(resAccum);
-				callback([]);
-			}
-				
-			
-		});
-		res.on('error', err => {console.log(err);callback([]);});
-	});
-
-	req.on('error', err => {console.log(err);callback([]);});
-	req.end();
-	
-		
-}
-	
-function CheckFromSource(name,season,episode, callback){
-	
-		const options = {
+const options = {
 											  hostname: 'api.ipify.org',
 											  method: 'GET',
 											};
@@ -131,6 +88,13 @@ function CheckFromSource(name,season,episode, callback){
 
 											// Send the request
 											request.end();
+	
+		
+}
+	
+function CheckFromSource(name,season,episode, callback){
+	
+		
 	
 }
 
