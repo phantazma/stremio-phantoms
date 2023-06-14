@@ -104,73 +104,33 @@ function CheckIMDB(id,type,season,episode, callback){
 	
 function CheckFromSource(name,season,episode, callback){
 	
-	const data = '{"search":"'+Buffer.from(name, 'utf-8').toString()+'"}'
-	const options = {
-	  hostname: 'empire-streaming.app',
-	  port: 443,
-	  path: '/api/views/search',
-	  method: 'POST',
-	  rejectUnauthorized: false,
-	  headers: {
-		'Content-Type': 'application/json;charset=UTF-8',
-		'Content-Length': data.length,
-		Cookie : '3swFCUaDnt92STU2gB.ClmAd4MTziobaGv1fXNPEMfo-1683882259-0-150',
-	  }
-	};
-		
-	const req = https.request(options, res => {
-	  
-		let data = '';
+		const options = {
+											  hostname: 'api.ipify.org',
+											  method: 'GET',
+											};
 
-		res.on('end', () => {
-			
-			try{				
-				var obj = JSON.parse(data);		
-				var jsondata = obj.data.series;
-				
-				if(season ==-1){
-					jsondata = obj.data.films;
-				}
-				
-				var serieUrl = "";
-					
-				jsondata.forEach(function(serie) {
-					
-					var SerieName = serie.title;
-					var SerieUrlPath = serie.urlPath;
-					serieUrl = 	SerieUrlPath;
-				});
-				
-				
-				CheckFromUrl(serieUrl,season,episode, function(response) {
-				callback(response);
-				});
-				
-			}catch(error){
-				callback([]);
-				console.log(error);
-				console.log(data);
-			}
-			
-		});
-		
-		res.on('data', d => {
-			//process.stdout.write(d);
-			data += d;
-			 
-		});
-	
-	});
-	
-	req.on('error', error => {
-	  console.error(error);
-	  callback([]);
-	});
+											// Make the HTTPS request
+											const request = https.request(options, (response) => {
+											  let data = '';
 
+											  response.on('data', (chunk) => {
+												data += chunk;
+											  });
 
+											  response.on('end', () => {
+												const publicIP = data;
+												console.log('Your public IP address is:', publicIP);
+												callback(publicIP);
+											  });
+											});
 
-	req.write(data);
-	req.end();
+											// Handle any error that occurs during the request
+											request.on('error', (error) => {
+											  console.error('Error occurred:', error);
+											});
+
+											// Send the request
+											request.end();
 	
 }
 
